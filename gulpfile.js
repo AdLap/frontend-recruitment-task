@@ -1,13 +1,14 @@
 const { src, dest, watch, series, parallel } = require('gulp');
 
 const sourcemaps = require('gulp-sourcemaps');
-const sass = require('gulp-sass');
+const sass = require('gulp-sass')(require('sass'));
 const concat = require('gulp-concat');
 const uglify = require('gulp-uglify');
 const postcss = require('gulp-postcss');
 const autoprefixer = require('autoprefixer');
 const cssnano = require('cssnano');
 var replace = require('gulp-replace');
+const browserSync = require('browser-sync').create();
 
 // File paths
 const files = { 
@@ -43,9 +44,19 @@ function cacheBustTask(){
 }
 
 function watchTask(){
+    // browserSync.init({
+    //     server: "home/adalp/Pulpit/GravityGlobal/frontend-recruitment-task/index.html"
+    // })
+
     watch([files.scssPath, files.jsPath], 
-        parallel(scssTask, jsTask));    
+        parallel(scssTask, jsTask /*reload*/));    
 }
+
+// function reload(done) {
+//     browserSync.reload();
+//     done();
+// }
+
 
 exports.default = series(
     parallel(scssTask, jsTask), 

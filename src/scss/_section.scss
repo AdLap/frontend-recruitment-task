@@ -1,0 +1,61 @@
+@use 'sass:color';
+@import './virables';
+
+.container {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin: 0 auto;
+    max-width: 1440px;
+    padding: 16px;
+
+    @media screen and (min-width: $medium-width) {
+        flex-direction: row;
+        justify-content: space-around;
+        padding: 32px 0;
+    }
+
+    &__image {
+        height: 330px;
+        max-width: 505px;
+        width: 100%;
+
+        &__picture {
+            height: 100%;
+            width: 100%;
+        }
+    }
+
+    &__content {
+        align-items: center;
+        display: flex;
+        flex-direction: column;
+        margin-top: 24px;
+        max-width: 380px;
+
+        &__paragraph {
+            margin-top: 24px;
+            text-align: justify;
+        }
+
+        &__button {
+            align-self: flex-start;
+            background: $color-primary;
+            color: $color-bright;
+            border-radius: 32px;
+            font-size: 16px;
+            font-weight: $font-bold;
+            margin-top: 32px;
+            padding: 12px 36px;
+
+            &:hover {
+                background: darken($color-primary, 10%);
+            }
+
+            @media screen and (min-width: $medium-width) {
+                padding: 16px 40px;
+            }
+        }
+    }
+}

@@ -1,0 +1,54 @@
+@use 'sass:color';
+@import './virables';
+
+.popup {
+    background: $color-popup-bg;
+    display: flex;
+    height: 100vh;
+    position: absolute;
+    width: 100vw;
+
+    &__window {
+        background: $color-bright;
+        margin: auto;
+        max-width: 920px;
+        padding: 56px 95px;
+        position: relative;
+        width: 90vw;
+
+        &__content {
+            margin-top: 24px;
+        }
+
+        &__close {
+            cursor: pointer;
+            height: 12px;
+            position: absolute;
+            right: 46px;
+            top: 46px;
+            width: 12px;
+
+            &__left,
+            &__right {
+                background: $color-dark-darker;
+                display: block;
+                height: 2px;
+                position: absolute;
+                left: 0;
+                width: 13.5px;
+            }
+
+            &__left {
+                top: 0;
+                transform: rotate(45deg);
+                transform-origin: 0 100%;
+            }
+
+            &__right {
+                bottom: 0;
+                transform: rotate(-45deg);
+                transform-origin: 0 0;
+            }
+        }
+    }
+}

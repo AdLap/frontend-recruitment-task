@@ -33,11 +33,18 @@ class Popup {
         this.popupCloseButton = document.createElement('div')
         this.popupCloseButton.classList.add('popup__window__close')
         popup.append(this.popupCloseButton)
+
+        const closeButtonLeftElement = document.createElement('span')
+        closeButtonLeftElement.classList.add('popup__window__close__left')
+        const closeButtonRightElement = document.createElement('span')
+        closeButtonRightElement.classList.add('popup__window__close__right')
+        this.popupCloseButton.append(closeButtonLeftElement, closeButtonRightElement)
     }
 
     onClosePopup(event) {
         if (event.target === this.popupWrapper || event.target === this.popupCloseButton) {
             this.popupWrapper.remove()
+            app.parentElement.style.overflow = 'visible'
         }
     }
 }
@@ -61,6 +68,9 @@ class Section {
 
         const picture = document.createElement('img')
         picture.classList.add('container__image__picture')
+        picture.src = './images/sean-o-KMn4VEeEPR8-unsplash_1_s6zmfh_ar_16_9,c_fill,g_auto__c_scale,w_596.jpg'
+        picture.alt = 'ocean'
+        picture.title = 'Ocean'
         imageWrapper.append(picture)
 
         const content = document.createElement('article')
@@ -89,10 +99,10 @@ class Section {
 
     onOpenPopup() {
         ++this.counter
-        if (this.counter >= 5) {
+        if (this.counter > 5) {
             this.counter = 0
         }
-
+        app.parentElement.style.overflow = 'hidden'
         return new Popup(this.parentElement, `You have clicked ${this.counter} times to related button.`)
     }
 }
