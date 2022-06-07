@@ -1,10 +1,17 @@
 const app = document.querySelector('#app')
-
 class Popup {
-    constructor(parentElement, popupContent) {
+    constructor(
+        parentElement,
+        popupCounterInfo,
+        resetButtonVisible,
+        currentSection
+    ) {
         this.parentElement = parentElement
-        this.popupContent = popupContent
+        this.popupCounterInfo = popupCounterInfo
+        this.resetButtonVisible = resetButtonVisible
+        this.currentSection = currentSection
         this.popupWrapper = null
+        this.popupWindow = null
         this.popupCloseButton = null
 
         this.createPopup()
@@ -14,31 +21,33 @@ class Popup {
         this.popupWrapper = document.createElement('div')
         this.popupWrapper.classList.add('popup')
         this.parentElement.prepend(this.popupWrapper)
-        this.popupWrapper.onclick = (event) => this.onClosePopup(event)
+        this.popupWrapper.addEventListener('click', event => this.onClosePopup(event))
 
-        const popup = document.createElement('div')
-        popup.classList.add('popup__window')
-        this.popupWrapper.append(popup)
+        this.popupWindow = document.createElement('div')
+        this.popupWindow.classList.add('popup__window')
+        this.popupWrapper.append(this.popupWindow)
 
         const popupTitle = document.createElement('h1')
         popupTitle.classList.add('popup__window__title')
         popupTitle.innerText = 'Alert!'
-        popup.append(popupTitle)
 
         const popupContent = document.createElement('p')
         popupContent.classList.add('popup__window__content')
-        popupContent.innerText = this.popupContent
-        popup.append(popupContent)
+        popupContent.innerText = this.popupCounterInfo
 
         this.popupCloseButton = document.createElement('div')
         this.popupCloseButton.classList.add('popup__window__close')
-        popup.append(this.popupCloseButton)
+        this.popupWindow.append(popupTitle, popupContent, this.popupCloseButton)
 
         const closeButtonLeftElement = document.createElement('span')
         closeButtonLeftElement.classList.add('popup__window__close__left')
         const closeButtonRightElement = document.createElement('span')
         closeButtonRightElement.classList.add('popup__window__close__right')
         this.popupCloseButton.append(closeButtonLeftElement, closeButtonRightElement)
+
+        if (this.resetButtonVisible) {
+            this.createResetButton()
+        }
     }
 
     onClosePopup(event) {
@@ -47,12 +56,29 @@ class Popup {
             app.parentElement.style.overflow = 'visible'
         }
     }
-}
 
+    onResetCounter() {
+        this.currentSection.onCounterUpdate(0)
+    }
+
+    createResetButton() {
+        const resetButton = document.createElement('button')
+        resetButton.classList.add('reset')
+        resetButton.innerText = 'Reset Counter'
+        this.popupWindow.append(resetButton)
+
+        resetButton.addEventListener('click', () => {
+            this.popupCounterInfo = 'The counter has beend reset.'
+            this.onResetCounter()
+        })
+    }
+}
 class Section {
-    constructor(parentElement) {
-        this.counter = 0
+    constructor(parentElement, name) {
+        this.counter = localStorage.getItem(`Section-${name}`) ?? 0
+        this.name = name
         this.parentElement = parentElement
+        this.resetButtonVisible = false
 
         this.createSection()
     }
@@ -93,19 +119,33 @@ class Section {
         button.innerText = 'Button'
         button.setAttribute('aria-label', 'Click me')
         content.append(button)
-        button.onclick = () => this.onOpenPopup()
+        button.addEventListener('click', () => this.onOpenPopup())
+    }
 
+    onCounterUpdate(value) {
+        this.counter = value
+        value === 0
+            ? localStorage.removeItem(`Section-${this.name}`)
+            : localStorage.setItem(`Section-${this.name}`, value)
     }
 
     onOpenPopup() {
         ++this.counter
-        if (this.counter > 5) {
-            this.counter = 0
-        }
+        localStorage.setItem(`Section-${this.name}`, this.counter)
+
+        this.counter > 2
+            ? this.resetButtonVisible = true
+            : this.resetButtonVisible = false
+
         app.parentElement.style.overflow = 'hidden'
-        return new Popup(this.parentElement, `You have clicked ${this.counter} times to related button.`)
+        return new Popup(
+            this.parentElement,
+            `You have clicked ${this.counter} times to related button.`,
+            this.resetButtonVisible,
+            this
+        )
     }
 }
 
-const firstSection = new Section(app)
-const secondSection = new Section(app)
+const firstSection = new Section(app, 'first')
+const secondSection = new Section(app, 'second')
