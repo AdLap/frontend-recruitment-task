@@ -36,9 +36,10 @@ class Popup {
         popupContent.classList.add('popup__window__content')
         popupContent.append(this.popupContentText)
 
-        this.popupCloseButton = document.createElement('div')
+        this.popupCloseButton = document.createElement('button')
         this.popupCloseButton.classList.add('popup__window__close')
-        this.popupCloseButton.title = 'Close alert'
+        this.popupCloseButton.setAttribute('aria-label', 'Close pop-up')
+        this.popupCloseButton.title = 'Close pop-up'
         this.popupWindow.append(popupTitle, popupContent, this.popupCloseButton)
 
         const closeButtonLeftElement = document.createElement('span')
@@ -53,8 +54,14 @@ class Popup {
     }
 
     onClosePopup(event) {
-        if (event.target === this.popupWrapper || event.target === this.popupCloseButton) {
+        if (
+            event.target === this.popupWrapper
+            || event.target === this.popupCloseButton
+            || event.target === this.popupCloseButton.childNodes[0]
+            || event.target === this.popupCloseButton.childNodes[1]
+        ) {
             this.popupWrapper.remove()
+            this.currentSection.onButtonsDisabled(false)
             app.parentElement.style.overflow = 'visible'
         }
     }
@@ -65,9 +72,12 @@ class Popup {
 
     createResetButton() {
         this.resetButton = document.createElement('button')
-        this.resetButton.classList.add('reset')
+        this.resetButton.classList.add('popup__window__reset')
         this.resetButton.innerText = 'Reset Counter'
+        this.resetButton.setAttribute('aria-label', 'Reset counter')
+        this.resetButton.title = 'Reset counter'
         this.popupWindow.append(this.resetButton)
+        this.resetButton.focus()
 
         this.resetButton.addEventListener('click', () => {
             this.popupContentText.textContent = 'The counter has beend reset.'
@@ -82,6 +92,7 @@ class Section {
         this.name = name
         this.parentElement = parentElement
         this.resetButtonVisible = false
+        this.button = null
 
         this.createSection()
     }
@@ -109,20 +120,20 @@ class Section {
         const sectionTitle = document.createElement('h1')
         sectionTitle.classList.add('container__content__title')
         sectionTitle.innerText = 'Lorem Ipsum'
-        content.append(sectionTitle)
 
         const paragraph = document.createElement('p')
         paragraph.classList.add('container__content__paragraph')
         paragraph.innerText = 'Infinitely scalable, feature-rich and cloud-native data management and protection for modern and legacy infrastructures and SaaS platforms, managed via a single app with no hardware required.'
-        content.append(paragraph)
 
-        const button = document.createElement('button')
-        button.classList.add('container__content__button')
-        button.type = 'button'
-        button.innerText = 'Button'
-        button.setAttribute('aria-label', 'Click me to increase counter')
-        content.append(button)
-        button.addEventListener('click', () => this.onOpenPopup())
+        this.button = document.createElement('button')
+        this.button.classList.add('container__content__button')
+        this.button.type = 'button'
+        this.button.innerText = 'Button'
+        this.button.title = 'Open pop-up and increase counter'
+        this.button.setAttribute('aria-label', 'Click me to increase counter')
+        content.append(sectionTitle, paragraph, this.button)
+
+        this.button.addEventListener('click', () => this.onOpenPopup())
     }
 
     onCounterUpdate(value) {
@@ -131,8 +142,12 @@ class Section {
         if (value !== 0) {
             return localStorage.setItem(`Section-${this.name}`, value)
         }
-
         localStorage.removeItem(`Section-${this.name}`)
+    }
+
+    onButtonsDisabled(value) {
+        this.button.disabled = value
+        
     }
 
     onOpenPopup() {
@@ -140,7 +155,8 @@ class Section {
         localStorage.setItem(`Section-${this.name}`, this.counter)
         this.resetButtonVisible = Boolean(this.counter > 5)
         app.parentElement.style.overflow = 'hidden'
-        
+        this.onButtonsDisabled(true)
+
         return new Popup(
             this.parentElement,
             `You have clicked ${this.counter} times to related button.`,

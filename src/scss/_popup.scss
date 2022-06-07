@@ -2,7 +2,7 @@
 @import './virables';
 
 .popup {
-    background: $color-popup-bg;
+    background: $color-dark-transparent;
     display: flex;
     height: 100vh;
     position: absolute;
@@ -21,12 +21,22 @@
         }
 
         &__close {
-            cursor: pointer;
-            height: 12px;
+            padding: 6px;
             position: absolute;
             right: 46px;
             top: 46px;
-            width: 12px;
+
+            &:focus {
+                border: 1px solid $color-dark;
+            }
+        
+            &:hover {
+                background: transparent;
+            }
+        
+            &:active {
+                box-shadow: 0 0 10px $color-dark-transparent;
+            }
 
             &__left,
             &__right {
@@ -49,6 +59,15 @@
                 transform: rotate(-45deg);
                 transform-origin: 0 0;
             }
+        }
+
+        &__reset {
+            background-color: $color-primary;
+            bottom: 46px;
+            color: $color-bright;
+            padding: 10px 20px;
+            position: absolute;
+            right: 26px;
         }
     }
 }

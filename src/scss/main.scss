@@ -27,7 +27,21 @@ p {
 
 button {
     background: transparent;
-    border: none;
+    border: 1px solid transparent;
     cursor: pointer;
+    font-weight: $font-bold;
     outline: none;
+    border-radius: 32px;
+
+    &:focus {
+        border: 1px solid $color-dark;
+    }
+
+    &:hover {
+        background: darken($color-primary, 10%);
+    }
+
+    &:active {
+        box-shadow: 0 0 10px $color-dark-transparent;
+    }
 }
