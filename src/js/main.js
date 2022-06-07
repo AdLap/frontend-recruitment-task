@@ -7,12 +7,13 @@ class Popup {
         currentSection
     ) {
         this.parentElement = parentElement
-        this.popupCounterInfo = popupCounterInfo
         this.resetButtonVisible = resetButtonVisible
         this.currentSection = currentSection
         this.popupWrapper = null
         this.popupWindow = null
         this.popupCloseButton = null
+        this.popupContentText = document.createTextNode(popupCounterInfo) ?? 'No data'
+        this.resetButton = null
 
         this.createPopup()
     }
@@ -33,10 +34,11 @@ class Popup {
 
         const popupContent = document.createElement('p')
         popupContent.classList.add('popup__window__content')
-        popupContent.innerText = this.popupCounterInfo
+        popupContent.append(this.popupContentText)
 
         this.popupCloseButton = document.createElement('div')
         this.popupCloseButton.classList.add('popup__window__close')
+        this.popupCloseButton.title = 'Close alert'
         this.popupWindow.append(popupTitle, popupContent, this.popupCloseButton)
 
         const closeButtonLeftElement = document.createElement('span')
@@ -62,14 +64,15 @@ class Popup {
     }
 
     createResetButton() {
-        const resetButton = document.createElement('button')
-        resetButton.classList.add('reset')
-        resetButton.innerText = 'Reset Counter'
-        this.popupWindow.append(resetButton)
+        this.resetButton = document.createElement('button')
+        this.resetButton.classList.add('reset')
+        this.resetButton.innerText = 'Reset Counter'
+        this.popupWindow.append(this.resetButton)
 
-        resetButton.addEventListener('click', () => {
-            this.popupCounterInfo = 'The counter has beend reset.'
+        this.resetButton.addEventListener('click', () => {
+            this.popupContentText.textContent = 'The counter has beend reset.'
             this.onResetCounter()
+            this.resetButton.remove()
         })
     }
 }
@@ -117,27 +120,27 @@ class Section {
         button.classList.add('container__content__button')
         button.type = 'button'
         button.innerText = 'Button'
-        button.setAttribute('aria-label', 'Click me')
+        button.setAttribute('aria-label', 'Click me to increase counter')
         content.append(button)
         button.addEventListener('click', () => this.onOpenPopup())
     }
 
     onCounterUpdate(value) {
         this.counter = value
-        value === 0
-            ? localStorage.removeItem(`Section-${this.name}`)
-            : localStorage.setItem(`Section-${this.name}`, value)
+
+        if (value !== 0) {
+            return localStorage.setItem(`Section-${this.name}`, value)
+        }
+
+        localStorage.removeItem(`Section-${this.name}`)
     }
 
     onOpenPopup() {
         ++this.counter
         localStorage.setItem(`Section-${this.name}`, this.counter)
-
-        this.counter > 2
-            ? this.resetButtonVisible = true
-            : this.resetButtonVisible = false
-
+        this.resetButtonVisible = Boolean(this.counter > 5)
         app.parentElement.style.overflow = 'hidden'
+        
         return new Popup(
             this.parentElement,
             `You have clicked ${this.counter} times to related button.`,
