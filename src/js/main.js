@@ -1,21 +1,23 @@
 const app = document.querySelector('#app')
 const MEDIA = {
-    xsmall: '(max-width: 479px)',
+    xSmall: '(max-width: 479px)',
     small: '(max-width: 783px)',
     medium: '(max-width: 1001px)',
     large: '(max-width: 1233px)',
     xLarge: '(max-width: 1439px)',
     xxLarge: '(min-width: 1440px)'
 }
-const pictureSources = {
-    xSmall: './images/sean-o-KMn4VEeEPR8-unsplash_1_s6zmfh_ar_1_1,c_fill,g_auto__c_scale,w_450.jpg',
-    small: './images/sean-o-KMn4VEeEPR8-unsplash_1_s6zmfh_c_scale,w_480.jpg',
-    medium: './images/sean-o-KMn4VEeEPR8-unsplash_1_s6zmfh_c_scale,w_784.jpg',
-    large: './images/sean-o-KMn4VEeEPR8-unsplash_1_s6zmfh_c_scale,w_1002.jpg',
-    xLarge: './images/sean-o-KMn4VEeEPR8-unsplash_1_s6zmfh_c_scale,w_1234.jpg',
-    xxLarge: './images/sean-o-KMn4VEeEPR8-unsplash_1_s6zmfh_c_scale,w_1400.jpg',
-    default: './images/sean-o-KMn4VEeEPR8-unsplash_1_s6zmfh_ar_1_1,c_fill,g_auto__c_scale,w_450.jpg'
-}
+
+const pictureSources = new Map([
+    ['xSmall', './images/sean-o-KMn4VEeEPR8-unsplash_1_s6zmfh_ar_1_1,c_fill,g_auto__c_scale,w_450.jpg'],
+    ['small', './images/sean-o-KMn4VEeEPR8-unsplash_1_s6zmfh_c_scale,w_480.jpg'],
+    ['medium', './images/sean-o-KMn4VEeEPR8-unsplash_1_s6zmfh_c_scale,w_784.jpg'],
+    ['large', './images/sean-o-KMn4VEeEPR8-unsplash_1_s6zmfh_c_scale,w_1002.jpg'],
+    ['xLarge', './images/sean-o-KMn4VEeEPR8-unsplash_1_s6zmfh_c_scale,w_1234.jpg'],
+    ['xxLarge', './images/sean-o-KMn4VEeEPR8-unsplash_1_s6zmfh_c_scale,w_1400.jpg'],
+    ['default', './images/sean-o-KMn4VEeEPR8-unsplash_1_s6zmfh_ar_1_1,c_fill,g_auto__c_scale,w_450.jpg']
+
+])
 class Popup {
     constructor(
         parentElement,
@@ -26,9 +28,9 @@ class Popup {
         this.parentElement = parentElement
         this.resetButtonVisible = resetButtonVisible
         this.currentSection = currentSection
-        this.popupWrapper = null
-        this.popupWindow = null
-        this.popupCloseButton = null
+        this.popupWrapper = document.createElement('div')
+        this.popupWindow = document.createElement('div')
+        this.popupCloseButton = document.createElement('button')
         this.popupContentText = document.createTextNode(popupCounterInfo) ?? 'No data'
         this.resetButton = null
 
@@ -36,12 +38,10 @@ class Popup {
     }
 
     createPopup() {
-        this.popupWrapper = document.createElement('div')
         this.popupWrapper.classList.add('popup')
         this.parentElement.prepend(this.popupWrapper)
         this.popupWrapper.addEventListener('click', event => this.onClosePopup(event))
 
-        this.popupWindow = document.createElement('div')
         this.popupWindow.classList.add('popup__window')
         this.popupWrapper.append(this.popupWindow)
 
@@ -53,11 +53,13 @@ class Popup {
         popupContent.classList.add('popup__window__content')
         popupContent.append(this.popupContentText)
 
-        this.popupCloseButton = document.createElement('button')
         this.popupCloseButton.classList.add('popup__window__close')
         this.popupCloseButton.setAttribute('aria-label', 'Close pop-up')
         this.popupCloseButton.title = 'Close pop-up'
         this.popupWindow.append(popupTitle, popupContent, this.popupCloseButton)
+        if (!this.resetButtonVisible) {
+            this.popupCloseButton.focus()
+        }
 
         const closeButtonLeftElement = document.createElement('span')
         closeButtonLeftElement.classList.add('popup__window__close__left')
@@ -108,42 +110,36 @@ class Picture {
     constructor(parentElement, pictureSources) {
         this.parentElement = parentElement
         this.pictureSources = pictureSources
+        this.imageWrapper = document.createElement('picture')
 
         this.createPicture()
     }
 
     createPicture() {
-        const imageWrapper = document.createElement('picture')
-        imageWrapper.classList.add('container__image')
-        this.parentElement.append(imageWrapper)
+        this.imageWrapper.classList.add('container__image')
+        this.parentElement.append(this.imageWrapper)
 
-        const xSmallWidth = document.createElement('source')
-        xSmallWidth.media = MEDIA.small
-        xSmallWidth.srcset = this.pictureSources.small
-        const smallWidth = document.createElement('source')
-        smallWidth.media = MEDIA.small
-        smallWidth.srcset = this.pictureSources.small
-        const mediumWidth = document.createElement('source')
-        mediumWidth.media = MEDIA.medium
-        mediumWidth.srcset = this.pictureSources.medium
-        const largeWidth = document.createElement('source')
-        largeWidth.media = MEDIA.large
-        largeWidth.srcset = this.pictureSources.large
-        const xLargeWidth = document.createElement('source')
-        xLargeWidth.media = MEDIA.xLarge
-        xLargeWidth.srcset = this.pictureSources.xLarge
-        const xxLargeWidth = document.createElement('source')
-        xxLargeWidth.media = MEDIA.xxLarge
-        xxLargeWidth.srcset = this.pictureSources.xxLarge
-
-        imageWrapper.append(smallWidth, mediumWidth, largeWidth, xLargeWidth, xxLargeWidth)
+        this.createPictureSource(this.pictureSources, MEDIA)
 
         const picture = document.createElement('img')
         picture.classList.add('container__image__picture')
-        picture.src = `${this.pictureSources.default}`
+        picture.src = this.pictureSources.get('default')
         picture.alt = 'ocean'
         picture.title = 'Ocean'
-        imageWrapper.append(picture)
+        this.imageWrapper.append(picture)
+    }
+
+    createPictureSource(source, media) {
+        if (!source.size) {
+            return
+        }
+
+        for (const [element, pictureSrc] of source.entries()) {
+            const el = document.createElement('source')
+            el.media = media[element]
+            el.srcset = pictureSrc
+            this.imageWrapper.append(el)
+        }
     }
 }
 class Section {
@@ -152,21 +148,21 @@ class Section {
         this.name = name
         this.parentElement = parentElement
         this.resetButtonVisible = false
-        this.button = null
+        this.section = document.createElement('section')
+        this.button = document.createElement('button')
 
         this.createSection()
     }
 
     createSection() {
-        const section = document.createElement('section')
-        section.classList.add('container')
-        this.parentElement.append(section)
+        this.section.classList.add('container')
+        this.parentElement.append(this.section)
 
-        new Picture(section, pictureSources)
+        new Picture(this.section, pictureSources)
        
         const content = document.createElement('article')
         content.classList.add('container__content')
-        section.append(content)
+        this.section.append(content)
 
         const sectionTitle = document.createElement('h1')
         sectionTitle.classList.add('container__content__title')
@@ -176,7 +172,6 @@ class Section {
         paragraph.classList.add('container__content__paragraph')
         paragraph.innerText = 'Infinitely scalable, feature-rich and cloud-native data management and protection for modern and legacy infrastructures and SaaS platforms, managed via a single app with no hardware required.'
 
-        this.button = document.createElement('button')
         this.button.classList.add('container__content__button')
         this.button.type = 'button'
         this.button.innerText = 'Button'
