@@ -63,11 +63,17 @@
 
         &__reset {
             background-color: $color-primary;
-            bottom: 46px;
+            bottom: 20px;
             color: $color-bright;
-            padding: 10px 20px;
+            padding: 7px 17px;
             position: absolute;
             right: 26px;
+
+            @media screen and (min-width: $medium-width) {
+                bottom: 46px;
+                padding: 10px 20px;
+                right: 26px;
+            }
         }
     }
 }

@@ -1,4 +1,21 @@
 const app = document.querySelector('#app')
+const MEDIA = {
+    xsmall: '(max-width: 479px)',
+    small: '(max-width: 783px)',
+    medium: '(max-width: 1001px)',
+    large: '(max-width: 1233px)',
+    xLarge: '(max-width: 1439px)',
+    xxLarge: '(min-width: 1440px)'
+}
+const pictureSources = {
+    xSmall: './images/sean-o-KMn4VEeEPR8-unsplash_1_s6zmfh_ar_1_1,c_fill,g_auto__c_scale,w_450.jpg',
+    small: './images/sean-o-KMn4VEeEPR8-unsplash_1_s6zmfh_c_scale,w_480.jpg',
+    medium: './images/sean-o-KMn4VEeEPR8-unsplash_1_s6zmfh_c_scale,w_784.jpg',
+    large: './images/sean-o-KMn4VEeEPR8-unsplash_1_s6zmfh_c_scale,w_1002.jpg',
+    xLarge: './images/sean-o-KMn4VEeEPR8-unsplash_1_s6zmfh_c_scale,w_1234.jpg',
+    xxLarge: './images/sean-o-KMn4VEeEPR8-unsplash_1_s6zmfh_c_scale,w_1400.jpg',
+    default: './images/sean-o-KMn4VEeEPR8-unsplash_1_s6zmfh_ar_1_1,c_fill,g_auto__c_scale,w_450.jpg'
+}
 class Popup {
     constructor(
         parentElement,
@@ -86,6 +103,49 @@ class Popup {
         })
     }
 }
+
+class Picture {
+    constructor(parentElement, pictureSources) {
+        this.parentElement = parentElement
+        this.pictureSources = pictureSources
+
+        this.createPicture()
+    }
+
+    createPicture() {
+        const imageWrapper = document.createElement('picture')
+        imageWrapper.classList.add('container__image')
+        this.parentElement.append(imageWrapper)
+
+        const xSmallWidth = document.createElement('source')
+        xSmallWidth.media = MEDIA.small
+        xSmallWidth.srcset = this.pictureSources.small
+        const smallWidth = document.createElement('source')
+        smallWidth.media = MEDIA.small
+        smallWidth.srcset = this.pictureSources.small
+        const mediumWidth = document.createElement('source')
+        mediumWidth.media = MEDIA.medium
+        mediumWidth.srcset = this.pictureSources.medium
+        const largeWidth = document.createElement('source')
+        largeWidth.media = MEDIA.large
+        largeWidth.srcset = this.pictureSources.large
+        const xLargeWidth = document.createElement('source')
+        xLargeWidth.media = MEDIA.xLarge
+        xLargeWidth.srcset = this.pictureSources.xLarge
+        const xxLargeWidth = document.createElement('source')
+        xxLargeWidth.media = MEDIA.xxLarge
+        xxLargeWidth.srcset = this.pictureSources.xxLarge
+
+        imageWrapper.append(smallWidth, mediumWidth, largeWidth, xLargeWidth, xxLargeWidth)
+
+        const picture = document.createElement('img')
+        picture.classList.add('container__image__picture')
+        picture.src = `${this.pictureSources.default}`
+        picture.alt = 'ocean'
+        picture.title = 'Ocean'
+        imageWrapper.append(picture)
+    }
+}
 class Section {
     constructor(parentElement, name) {
         this.counter = localStorage.getItem(`Section-${name}`) ?? 0
@@ -102,17 +162,8 @@ class Section {
         section.classList.add('container')
         this.parentElement.append(section)
 
-        const imageWrapper = document.createElement('div')
-        imageWrapper.classList.add('container__image')
-        section.append(imageWrapper)
-
-        const picture = document.createElement('img')
-        picture.classList.add('container__image__picture')
-        picture.src = './images/sean-o-KMn4VEeEPR8-unsplash_1_s6zmfh_ar_16_9,c_fill,g_auto__c_scale,w_596.jpg'
-        picture.alt = 'ocean'
-        picture.title = 'Ocean'
-        imageWrapper.append(picture)
-
+        new Picture(section, pictureSources)
+       
         const content = document.createElement('article')
         content.classList.add('container__content')
         section.append(content)
@@ -148,7 +199,7 @@ class Section {
     onButtonsDisabled(value) {
         const buttons = document.querySelectorAll('.container button')
         buttons.forEach(button => button.disabled = value)
-        
+
     }
 
     onOpenPopup() {
