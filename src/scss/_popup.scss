@@ -9,11 +9,16 @@
 
     &__window {
         background: $color-bright;
+        height: 300px;
         margin: auto;
         max-width: 920px;
         padding: 56px 95px;
         position: relative;
         width: 90vw;
+
+        @media screen and (min-width: $medium-width), (orientation: landscape) {
+            height: unset;
+        }
 
         &__content {
             margin-top: 24px;

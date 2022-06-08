@@ -7,8 +7,13 @@
     justify-content: center;
     margin: 0 auto;
     max-width: 1440px;
-    padding: 16px;
+    padding: 16px 16px 32px;
     width: 100vw;
+
+    @media screen and (orientation: landscape) {
+        flex-direction: row;
+        gap: 3vw;
+    }
 
     @media screen and (min-width: $medium-width) {
         flex-direction: row;
@@ -29,12 +34,12 @@
         overflow: hidden;
         width: 100%;
 
-        @media screen and (min-width: $medium-width) {
+        @media screen and (min-width: $medium-width), (orientation: landscape) {
             width: 40vw;
         }
 
         &__picture {
-            height: auto; // 100%;
+            height: auto;
             width: 100%;
         }
     }
