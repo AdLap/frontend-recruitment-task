@@ -146,7 +146,8 @@ class Section {
     }
 
     onButtonsDisabled(value) {
-        this.button.disabled = value
+        const buttons = document.querySelectorAll('.container button')
+        buttons.forEach(button => button.disabled = value)
         
     }
 

@@ -1,11 +1,10 @@
-@use 'sass:color';
 @import './virables';
 
 .popup {
     background: $color-dark-transparent;
     display: flex;
     height: 100vh;
-    position: absolute;
+    position: fixed;
     width: 100vw;
 
     &__window {
@@ -21,6 +20,7 @@
         }
 
         &__close {
+            background: transparent;
             padding: 6px;
             position: absolute;
             right: 46px;

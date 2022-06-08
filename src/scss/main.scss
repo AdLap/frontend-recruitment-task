@@ -26,19 +26,20 @@ p {
 }
 
 button {
-    background: transparent;
+    background: $color-primary;
     border: 1px solid transparent;
+    color: $color-bright;
     cursor: pointer;
     font-weight: $font-bold;
     outline: none;
     border-radius: 32px;
 
     &:focus {
-        border: 1px solid $color-dark;
+        border: 1px solid $color-dark-transparent;
     }
 
     &:hover {
-        background: darken($color-primary, 10%);
+        background: $color-primary-dark;
     }
 
     &:active {
