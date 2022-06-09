@@ -44,22 +44,27 @@ function cacheBustTask(){
 }
 
 function watchTask(){
-    // browserSync.init({
-    //     server: "home/adalp/Pulpit/GravityGlobal/frontend-recruitment-task/index.html"
-    // })
-
     watch([files.scssPath, files.jsPath], 
-        parallel(scssTask, jsTask /*reload*/));    
+        parallel(scssTask, jsTask, reload));    
 }
 
-// function reload(done) {
-//     browserSync.reload();
-//     done();
-// }
+function server(done){
+    browserSync.init({
+        server: {
+            baseDir: '.'
+        }
+    })
+    done()
+}
+
+function reload(done) {
+    browserSync.reload();
+    done();
+}
 
 
 exports.default = series(
-    parallel(scssTask, jsTask), 
+    parallel(scssTask, jsTask, server), 
     cacheBustTask,
     watchTask
 );

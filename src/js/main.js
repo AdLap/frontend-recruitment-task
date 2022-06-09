@@ -1,4 +1,3 @@
-const app = document.querySelector('#app')
 const MEDIA = {
     xSmall: '(max-width: 479px)',
     small: '(max-width: 783px)',
@@ -18,6 +17,9 @@ const pictureSources = new Map([
     ['default', './images/sean-o-KMn4VEeEPR8-unsplash_1_s6zmfh_ar_1_1,c_fill,g_auto__c_scale,w_450.jpg']
 
 ])
+
+const app = document.querySelector('#app')
+
 class Popup {
     constructor(
         parentElement,
@@ -107,9 +109,11 @@ class Popup {
 }
 
 class Picture {
-    constructor(parentElement, pictureSources) {
+    constructor(parentElement, pictureSources, media, altText) {
         this.parentElement = parentElement
         this.pictureSources = pictureSources
+        this.media = media
+        this.altText = altText
         this.imageWrapper = document.createElement('picture')
 
         this.createPicture()
@@ -119,13 +123,13 @@ class Picture {
         this.imageWrapper.classList.add('container__image')
         this.parentElement.append(this.imageWrapper)
 
-        this.createPictureSource(this.pictureSources, MEDIA)
+        this.createPictureSource(this.pictureSources, this.media)
 
         const picture = document.createElement('img')
         picture.classList.add('container__image__picture')
         picture.src = this.pictureSources.get('default')
-        picture.alt = 'ocean'
-        picture.title = 'Ocean'
+        picture.alt = this.altText
+        picture.title = this.altText
         this.imageWrapper.append(picture)
     }
 
@@ -134,14 +138,15 @@ class Picture {
             return
         }
 
-        for (const [element, pictureSrc] of source.entries()) {
-            const el = document.createElement('source')
-            el.media = media[element]
-            el.srcset = pictureSrc
-            this.imageWrapper.append(el)
+        for (const [widthName, pictureSrc] of source.entries()) {
+            const element = document.createElement('source')
+            element.media = media[widthName]
+            element.srcset = pictureSrc
+            this.imageWrapper.append(element)
         }
     }
 }
+
 class Section {
     constructor(parentElement, name) {
         this.counter = localStorage.getItem(`Section-${name}`) ?? 0
@@ -158,7 +163,7 @@ class Section {
         this.section.classList.add('container')
         this.parentElement.append(this.section)
 
-        new Picture(this.section, pictureSources)
+        new Picture(this.section, pictureSources, MEDIA, 'Ocean')
        
         const content = document.createElement('article')
         content.classList.add('container__content')
@@ -200,16 +205,17 @@ class Section {
     onOpenPopup() {
         ++this.counter
         localStorage.setItem(`Section-${this.name}`, this.counter)
-        this.resetButtonVisible = Boolean(this.counter > 5)
+        this.resetButtonVisible = this.counter > 5
         app.parentElement.style.overflow = 'hidden'
         this.onButtonsDisabled(true)
 
-        return new Popup(
+        const popupWindow = new Popup(
             this.parentElement,
             `You have clicked ${this.counter} times to related button.`,
             this.resetButtonVisible,
             this
         )
+        return popupWindow
     }
 }
 
