@@ -35,6 +35,7 @@ class Popup {
         this.popupCloseButton = document.createElement('button')
         this.popupContentText = document.createTextNode(popupCounterInfo) ?? 'No data'
         this.resetButton = null
+        this.data = null
 
         this.createPopup()
     }
@@ -72,6 +73,8 @@ class Popup {
         if (this.resetButtonVisible) {
             this.createResetButton()
         }
+
+        new DataTable(this.popupWindow, 'https://jsonplaceholder.typicode.com/users')
     }
 
     onClosePopup(event) {
@@ -164,7 +167,7 @@ class Section {
         this.parentElement.append(this.section)
 
         new Picture(this.section, pictureSources, MEDIA, 'Ocean')
-       
+
         const content = document.createElement('article')
         content.classList.add('container__content')
         this.section.append(content)
@@ -209,15 +212,90 @@ class Section {
         app.parentElement.style.overflow = 'hidden'
         this.onButtonsDisabled(true)
 
-        const popupWindow = new Popup(
+        new Popup(
             this.parentElement,
             `You have clicked ${this.counter} times to related button.`,
             this.resetButtonVisible,
             this
         )
-        return popupWindow
     }
 }
 
-const firstSection = new Section(app, 'first')
-const secondSection = new Section(app, 'second')
+new Section(app, 'first')
+new Section(app, 'second')
+
+
+// Additional Task
+
+async function fetchData(url) {
+    try {
+        const response = await fetch(url, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        if (!response.ok) {
+            throw new Error(response.statusText)
+        }
+        const data = await response.json()
+        return data
+    } catch (error) {
+        console.log(error)
+        return new Error(error)
+    }
+}
+
+class DataTable {
+    constructor(parentElement, url) {
+        this.parentElement = parentElement
+        this.table = document.createElement('table')
+        this.loader = document.createElement('div')
+        this.url = url
+        this.data = []
+        this.isLoading = true
+
+        this.createTable()
+    }
+
+    createTable() {
+        this.table.classList.add('table')
+        this.parentElement.append(this.table)
+
+        if (this.isLoading) {
+            this.loader.classList.add('table__loader')
+            this.loader.innerText = 'load'
+            this.table.append(this.loader)
+        }
+        if (!this.isLoading) {
+            this.loader.remove()
+        }
+        this.setData()
+    }
+
+    drawTableBody(data) {
+        data.forEach((data, index) => {
+            const row = document.createElement('tr')
+            const name = document.createElement('td')
+            name.innerText = data.name
+            const email = document.createElement('td')
+            email.innerText = data.email
+            const address = document.createElement('td')
+            address.innerText = data.address
+            const phone = document.createElement('td')
+            phone.innerText = data.phone
+            const company = document.createElement('td')
+            company.innerText = data.company
+
+            row.append(name, email, address, phone, company)
+            this.table.append(row)
+        })
+    }
+
+    async setData() {
+        this.isLoading = true
+        this.data = await fetchData(this.url)
+        this.drawTableBody(this.data)
+        this.loader.remove()
+        this.isLoading = false
+    }
+}
