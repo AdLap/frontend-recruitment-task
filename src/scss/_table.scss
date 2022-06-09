@@ -1,0 +1,37 @@
+@import './virables';
+
+.table {
+    margin: 16px auto;
+    width: 100%;
+
+    td,
+    th {
+        padding: 5px;
+    }
+
+    span {
+        display: block;
+    }
+
+    &__loader {
+        animation: spinner 1s ease infinite;
+        border: 4px dotted $color-dark-transparent;
+        border-left-color: $color-dark;
+        border-right-color: $color-dark;
+        border-top: 8px solid $color-dark;
+        border-radius: 50%;
+        height: 4rem;
+        margin: auto;
+        width: 4rem;
+    }
+}
+
+@keyframes spinner {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}

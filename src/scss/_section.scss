@@ -34,7 +34,8 @@
         overflow: hidden;
         width: 100%;
 
-        @media screen and (min-width: $medium-width), (orientation: landscape) {
+        @media screen and (min-width: $medium-width),
+        (orientation: landscape) {
             width: 40vw;
         }
 

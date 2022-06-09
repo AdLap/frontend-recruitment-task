@@ -241,7 +241,6 @@ async function fetchData(url) {
         return data
     } catch (error) {
         console.log(error)
-        return new Error(error)
     }
 }
 
@@ -263,7 +262,6 @@ class DataTable {
 
         if (this.isLoading) {
             this.loader.classList.add('table__loader')
-            this.loader.innerText = 'load'
             this.table.append(this.loader)
         }
         if (!this.isLoading) {
@@ -273,6 +271,22 @@ class DataTable {
     }
 
     drawTableBody(data) {
+        const tableHead = document.createElement('thead')
+        const headRow = document.createElement('tr')
+        tableHead.append(headRow)
+        const headName = document.createElement('th')
+        headName.innerText = 'Name'
+        const headEmail = document.createElement('th')
+        headEmail.innerText = 'Email'
+        const headAddress = document.createElement('th')
+        headAddress.innerText = 'Address'
+        const headPhone = document.createElement('th')
+        headPhone.innerText = 'Phone'
+        const headCompany = document.createElement('th')
+        headCompany.innerText = 'Company'
+        headRow.append(headName, headEmail, headAddress, headPhone, headCompany)
+        const tableBody = document.createElement('tbody')
+
         data.forEach((data, index) => {
             const row = document.createElement('tr')
             const name = document.createElement('td')
@@ -280,15 +294,23 @@ class DataTable {
             const email = document.createElement('td')
             email.innerText = data.email
             const address = document.createElement('td')
-            address.innerText = data.address
+            const city = document.createElement('span')
+            city.innerText = data.address.city
+            const street = document.createElement('span')
+            street.innerText = data.address.street
+            const suite = document.createElement('span')
+            suite.innerText = data.address.suite
+            address.append(city, street, suite)
             const phone = document.createElement('td')
             phone.innerText = data.phone
             const company = document.createElement('td')
-            company.innerText = data.company
+            company.innerText = data.company.name
 
+            tableBody.append(row)
             row.append(name, email, address, phone, company)
-            this.table.append(row)
         })
+
+        this.table.append(tableHead, tableBody)
     }
 
     async setData() {
