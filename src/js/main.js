@@ -228,19 +228,31 @@ new Section(app, 'second')
 // Additional Task
 
 async function fetchData(url) {
+    const controller = new AbortController()
+    const abortTime = () => setTimeout(() => controller.abort(), 5000)
+    abortTime()
+
     try {
         const response = await fetch(url, {
             headers: {
                 'Content-Type': 'application/json'
-            }
+            },
+            signal: controller.signal
         })
         if (!response.ok) {
             throw new Error(response.statusText)
         }
         const data = await response.json()
         return data
+
     } catch (error) {
-        console.log(error)
+        if (error.name === 'AbortError') {
+            return new Error(error.message)
+        }
+        return error
+
+    } finally {
+        clearTimeout(abortTime)
     }
 }
 
@@ -287,7 +299,7 @@ class DataTable {
         headRow.append(headName, headEmail, headAddress, headPhone, headCompany)
         const tableBody = document.createElement('tbody')
 
-        data.forEach((data, index) => {
+        data.forEach(data => {
             const row = document.createElement('tr')
             const name = document.createElement('td')
             name.innerText = data.name
@@ -315,9 +327,33 @@ class DataTable {
 
     async setData() {
         this.isLoading = true
-        this.data = await fetchData(this.url)
-        this.drawTableBody(this.data)
+        const result = await fetchData(this.url)
+
+        if (result instanceof Error) {
+            this.data = []
+            this.isLoading = false
+            this.loader.remove()
+            return this.showErrorInfo(result)
+        }
+
+        this.drawTableBody(result)
         this.loader.remove()
         this.isLoading = false
+    }
+
+    showErrorInfo(result) {
+        const errorWrapper = document.createElement('div')
+        errorWrapper.classList.add('error')
+        this.table.append(errorWrapper)
+
+        const errorName = document.createElement('h2')
+        errorName.classList.add('error__title')
+        errorName.innerText = result.name
+
+        const errorMessage = document.createElement('p')
+        errorMessage.classList.add('error__message')
+        errorMessage.innerText = result.message
+
+        errorWrapper.append(errorName, errorMessage)
     }
 }

@@ -1,0 +1,19 @@
+@import './virables';
+
+.error {
+    color: $color-error;
+
+    &__title,
+    &__message {
+        margin: 10px 16px auto;
+
+        @media screen and (min-width: $medium-width),
+        (orientation: landscape) {
+            margin: 10px 56px auto;
+        }
+
+        @media screen and (min-width: $large-width) {
+            margin: 10px 0 0;
+        }
+    }
+}
