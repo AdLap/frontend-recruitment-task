@@ -23,17 +23,18 @@ const app = document.querySelector('#app')
 class Popup {
     constructor(
         parentElement,
-        popupCounterInfo,
+        counter,
         resetButtonVisible,
         currentSection
     ) {
         this.parentElement = parentElement
+        this.counter = counter
         this.resetButtonVisible = resetButtonVisible
         this.currentSection = currentSection
         this.popupWrapper = document.createElement('div')
         this.popupWindow = document.createElement('div')
         this.popupCloseButton = document.createElement('button')
-        this.popupContentText = document.createTextNode(popupCounterInfo) ?? 'No data'
+        this.popupContent = document.createElement('p')
         this.resetButton = null
         this.data = null
 
@@ -52,14 +53,13 @@ class Popup {
         popupTitle.classList.add('popup__window__title')
         popupTitle.innerText = 'Alert!'
 
-        const popupContent = document.createElement('p')
-        popupContent.classList.add('popup__window__content')
-        popupContent.append(this.popupContentText)
+        this.popupContent.classList.add('popup__window__content')
+        this.createContentText(this.popupContent, this.counter)
 
         this.popupCloseButton.classList.add('popup__window__close')
         this.popupCloseButton.setAttribute('aria-label', 'Close pop-up')
         this.popupCloseButton.title = 'Close pop-up'
-        this.popupWindow.append(popupTitle, popupContent, this.popupCloseButton)
+        this.popupWindow.append(popupTitle, this.popupContent, this.popupCloseButton)
         if (!this.resetButtonVisible) {
             this.popupCloseButton.focus()
         }
@@ -91,7 +91,9 @@ class Popup {
     }
 
     onResetCounter() {
+        this.popupContent.textContent = 'The counter has beend reset.'
         this.currentSection.onCounterUpdate(0)
+        this.resetButton.remove()
     }
 
     createResetButton() {
@@ -104,15 +106,29 @@ class Popup {
         this.resetButton.focus()
 
         this.resetButton.addEventListener('click', () => {
-            this.popupContentText.textContent = 'The counter has beend reset.'
             this.onResetCounter()
-            this.resetButton.remove()
         })
+    }
+
+    createContentText(parentElement, counter) {
+        const popupContentCounter = document.createElement('strong')
+        parentElement.append(popupContentCounter)
+        const firstTextElement = document.createTextNode('You have clicked')
+        const counterTextElement = document.createTextNode(` ${counter} times `)
+        const lastTextElement = document.createTextNode('to related button.')
+        parentElement.prepend(firstTextElement)
+        popupContentCounter.append(counterTextElement)
+        parentElement.append(lastTextElement)
     }
 }
 
 class Picture {
-    constructor(parentElement, pictureSources, media, altText) {
+    constructor(
+        parentElement,
+        pictureSources,
+        media,
+        altText
+    ) {
         this.parentElement = parentElement
         this.pictureSources = pictureSources
         this.media = media
@@ -214,7 +230,7 @@ class Section {
 
         new Popup(
             this.parentElement,
-            `You have clicked ${this.counter} times to related button.`,
+            this.counter,
             this.resetButtonVisible,
             this
         )
@@ -330,7 +346,6 @@ class DataTable {
         const result = await fetchData(this.url)
 
         if (result instanceof Error) {
-            this.data = []
             this.isLoading = false
             this.loader.remove()
             return this.showErrorInfo(result)
