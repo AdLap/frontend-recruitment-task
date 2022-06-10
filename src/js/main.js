@@ -36,7 +36,6 @@ class Popup {
         this.popupCloseButton = document.createElement('button')
         this.popupContent = document.createElement('p')
         this.resetButton = null
-        this.data = null
 
         this.createPopup()
     }
@@ -210,7 +209,8 @@ class Section {
         this.counter = value
 
         if (value !== 0) {
-            return localStorage.setItem(`Section-${this.name}`, value)
+            localStorage.setItem(`Section-${this.name}`, value)
+            return
         }
         localStorage.removeItem(`Section-${this.name}`)
     }
@@ -279,7 +279,7 @@ class DataTable {
         this.loader = document.createElement('div')
         this.url = url
         this.data = []
-        this.isLoading = true
+        this.isLoading = false
 
         this.createTable()
     }
@@ -287,6 +287,7 @@ class DataTable {
     createTable() {
         this.table.classList.add('table')
         this.parentElement.append(this.table)
+        this.setData()
 
         if (this.isLoading) {
             this.loader.classList.add('table__loader')
@@ -295,7 +296,6 @@ class DataTable {
         if (!this.isLoading) {
             this.loader.remove()
         }
-        this.setData()
     }
 
     drawTableBody(data) {
@@ -352,8 +352,8 @@ class DataTable {
         }
 
         this.drawTableBody(result)
-        this.loader.remove()
         this.isLoading = false
+        this.loader.remove()
     }
 
     showErrorInfo(result) {
